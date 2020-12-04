@@ -1,26 +1,32 @@
 package com.example.imagepicker
 
 import android.R.attr
-import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.fxn.pix.Options
+import com.fxn.pix.Pix
+import com.fxn.utility.PermUtil
 import com.google.android.material.snackbar.Snackbar
 import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.ArrayList
+
 
 //source : https://github.com/ArthurHub/Android-Image-Cropper
+https://github.com/ArthurHub/Android-Image-Cropper
 
 
 class MainActivity : AppCompatActivity() {
@@ -53,10 +59,13 @@ class MainActivity : AppCompatActivity() {
         tvSelectedUri = findViewById(R.id.tvSelectedUri)
 
         btnLaunchCropper.setOnClickListener {
-            CropImage.activity()
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .setFixAspectRatio(true)
-                .start(this)
+
+            Pix.start(this, Options.init().setRequestCode(100))
+
+//            CropImage.activity("file:///data/user/0/com.example.imagepicker/cache/cropped8266080196312026720.jpg".toUri())
+//                .setGuidelines(CropImageView.Guidelines.ON)
+//                .setFixAspectRatio(true)
+//                .start(this)
         }
 
 
@@ -67,6 +76,30 @@ class MainActivity : AppCompatActivity() {
 //        CropImage.activity(imgUri)
 //            .start(this)
 
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS -> {
+
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.isNotEmpty() && grantResults[0] === PackageManager.PERMISSION_GRANTED) {
+                    Pix.start(this@MainActivity, Options.init().setRequestCode(100))
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Approve permissions to open Pix ImagePicker",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                return
+            }
+        }
     }
 
 
@@ -82,6 +115,13 @@ class MainActivity : AppCompatActivity() {
                     resultUri.toString(),
                     Snackbar.LENGTH_LONG
                 ).show()
+
+                if(resultCode == 100){
+                    val returnValue: ArrayList<String>? =
+                       data?.getStringArrayListExtra(Pix.IMAGE_RESULTS)
+
+                    Log.i("WILLS", "onActivityResult: $returnValue")
+                }
 
 
             } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
