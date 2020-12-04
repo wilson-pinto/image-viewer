@@ -15,11 +15,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
-import org.w3c.dom.Text
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+
+//source : https://github.com/ArthurHub/Android-Image-Cropper
 
 
 class MainActivity : AppCompatActivity() {
