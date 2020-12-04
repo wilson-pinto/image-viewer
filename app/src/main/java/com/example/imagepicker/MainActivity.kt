@@ -1,6 +1,5 @@
 package com.example.imagepicker
 
-import android.R.attr
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -22,16 +21,17 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.ArrayList
+import java.util.*
 
 
 //source : https://github.com/ArthurHub/Android-Image-Cropper
-https://github.com/ArthurHub/Android-Image-Cropper
+//source : https://github.com/akshay2211/PixImagePicker
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var tvSelectedUri: TextView
+    private var returnValue: ArrayList<String> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +60,17 @@ class MainActivity : AppCompatActivity() {
 
         btnLaunchCropper.setOnClickListener {
 
-            Pix.start(this, Options.init().setRequestCode(100))
+            val options = Options.init()
+                .setPreSelectedUrls(returnValue)
+                .setRequestCode(100) //Request code for activity results
+                .setCount(15) //Number of images to restict selection count
+                .setSpanCount(4) //Span count for gallery min 1 & max 5
+                .setExcludeVideos(true) //Option to exclude videos
+                .setScreenOrientation(Options.SCREEN_ORIENTATION_PORTRAIT) //Orientaion
+                .setPath("/pix/images") //Custom Path For media Storage
+
+
+            Pix.start(this@MainActivity, options)
 
 //            CropImage.activity("file:///data/user/0/com.example.imagepicker/cache/cropped8266080196312026720.jpg".toUri())
 //                .setGuidelines(CropImageView.Guidelines.ON)
@@ -105,6 +115,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 100) {
+            returnValue = data?.getStringArrayListExtra(Pix.IMAGE_RESULTS)!!
+
+            Log.i("WILLS", "onActivityResult: $returnValue")
+        }
         if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)
             if (resultCode === RESULT_OK) {
@@ -115,14 +131,6 @@ class MainActivity : AppCompatActivity() {
                     resultUri.toString(),
                     Snackbar.LENGTH_LONG
                 ).show()
-
-                if(resultCode == 100){
-                    val returnValue: ArrayList<String>? =
-                       data?.getStringArrayListExtra(Pix.IMAGE_RESULTS)
-
-                    Log.i("WILLS", "onActivityResult: $returnValue")
-                }
-
 
             } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 val error = result.error
