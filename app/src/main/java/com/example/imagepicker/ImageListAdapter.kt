@@ -3,6 +3,7 @@ package com.example.imagepicker
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -37,10 +38,10 @@ class ImageListAdapter : RecyclerView.Adapter<ImageListAdapter.ImageListHolder>(
         holder.ivImage.setImageURI(_imageList[holder.adapterPosition].toUri())
 
         if (holder.adapterPosition == _selectedPosition) {
-            holder.ivImage.background =
+            holder.flWrapper.background =
                 ContextCompat.getDrawable(holder.itemView.context, R.drawable.image_border)
         }else{
-            holder.ivImage.background =
+            holder.flWrapper.background =
                 ContextCompat.getDrawable(holder.itemView.context, R.drawable.image_no_border)
         }
     }
@@ -51,5 +52,6 @@ class ImageListAdapter : RecyclerView.Adapter<ImageListAdapter.ImageListHolder>(
 
     inner class ImageListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ivImage: ImageView = itemView.findViewById(R.id.ivImage)
+        val flWrapper: FrameLayout = itemView.findViewById(R.id.flWrapper)
     }
 }

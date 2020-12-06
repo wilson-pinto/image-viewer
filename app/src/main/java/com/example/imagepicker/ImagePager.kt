@@ -19,6 +19,10 @@ class ImagePager(private val _views: MutableList<String>, val _context: Context)
         return _views.size
     }
 
+    override fun getItemPosition(`object`: Any): Int {
+        return POSITION_NONE
+    }
+
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view === `object` as ConstraintLayout
     }

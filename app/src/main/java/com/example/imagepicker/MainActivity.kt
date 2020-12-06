@@ -8,6 +8,8 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
+import androidx.recyclerview.widget.RecyclerView
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
 import com.fxn.utility.PermUtil
@@ -50,15 +52,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnLaunchCropper.setOnClickListener {
-            CropImage.activity()
+            CropImage.activity("file:///storage/emulated/0/DCIM/Screenshots/Screenshot_2020-11-29-19-48-10-523_com.whatsapp.jpg".toUri())
                 .setGuidelines(CropImageView.Guidelines.ON)
-                .setAllowFlipping(false)
                 .start(this)
         }
 
         btnLaunchPageViewer.setOnClickListener {
             DisplayImageDialog(returnValue).show(supportFragmentManager, "Submit")
         }
+
+        val imageListAdapter = ImageListAdapter()
+
+        val rvImages: RecyclerView = findViewById(R.id.rvImages)
+
+        rvImages.apply {
+            adapter = imageListAdapter
+        }
+
+        val _imageList : MutableList<String> = mutableListOf()
+        for(i in 0 until 10){
+            _imageList.add("dfafdsad")
+        }
+
+        imageListAdapter.addList(_imageList)
 
     }
 
