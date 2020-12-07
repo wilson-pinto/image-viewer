@@ -16,21 +16,25 @@ import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
-import com.fxn.pix.Options
-import com.fxn.pix.Pix
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import java.util.*
 
-class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFragment(),
+class DisplayImageDialog(
+    private val _imageList: ArrayList<String>,
+    private val _cropEnabled: Boolean = false,
+) : DialogFragment(),
     ImageViewerThumbnailAdapter.ImageThumbnailListener {
 
     private val TAG = "WILLS"
     private var _currentPosition: Int = 0
 
-    private lateinit var _viewPagerAdapter: ImagePager
-    private lateinit var _vpImages: ViewPager
+    private lateinit var _viewPagerAdapterAdapter: ImagePagerAdapter
+    private lateinit var _vpImage: ViewPager
     private lateinit var _imageViewerThumbnailAdapter: ImageViewerThumbnailAdapter
+    private lateinit var _itemCount: TextView
+    private lateinit var _vBottom: View
+    private lateinit var _rvThumbNail: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,22 +63,30 @@ class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFrag
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        _vpImages = view.findViewById<View>(R.id.pager) as ViewPager
+        _vpImage = view.findViewById<View>(R.id.vpImage) as ViewPager
 
-        _viewPagerAdapter = ImagePager(_imageList, view.context)
+        _viewPagerAdapterAdapter = ImagePagerAdapter(_imageList, view.context)
         _imageViewerThumbnailAdapter = ImageViewerThumbnailAdapter(this)
 
         val btnCropImage: ImageButton = view.findViewById(R.id.btnCropImage)
+        val btnDelete: ImageButton = view.findViewById(R.id.btnDelete)
         val btnBack: ImageButton = view.findViewById(R.id.btnBack)
-        val itemCount: TextView = view.findViewById(R.id.itemCount)
-        val rvImages: RecyclerView = view.findViewById(R.id.rvImages)
-        val ibAddMore: ImageButton = view.findViewById(R.id.ibAddMore)
+        _itemCount = view.findViewById(R.id.itemCount)
+        _rvThumbNail = view.findViewById(R.id.rvThumbNail)
+        _vBottom = view.findViewById(R.id.vBottom)
 
-        _vpImages.adapter = _viewPagerAdapter
+        _vpImage.adapter = _viewPagerAdapterAdapter
 
-        itemCount.text = "${_vpImages.currentItem + 1}/${_imageList.size}"
+        _rvThumbNail.apply {
+            adapter = _imageViewerThumbnailAdapter
+        }
 
-        _vpImages.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        _imageViewerThumbnailAdapter.addList(_imageList)
+
+        updateCount()
+        updateThumbnailListVisibility()
+
+        _vpImage.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(
                 position: Int,
                 positionOffset: Float,
@@ -84,51 +96,70 @@ class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFrag
 
             override fun onPageSelected(position: Int) {
                 _currentPosition = position
-                itemCount.text = "${_vpImages.currentItem + 1}/${_imageList.size}"
+                updateCount()
                 _imageViewerThumbnailAdapter.changeSelectedItem(position)
-                rvImages.scrollToPosition(_currentPosition)
+                _rvThumbNail.scrollToPosition(_currentPosition)
             }
 
             override fun onPageScrollStateChanged(state: Int) {
             }
         })
 
-        rvImages.apply {
-            adapter = _imageViewerThumbnailAdapter
-        }
-
-        _imageViewerThumbnailAdapter.addList(_imageList)
-
-        btnCropImage.setOnClickListener {
-            _currentPosition = _vpImages.currentItem
-            CropImage.activity(("file://" + _imageList[_currentPosition]).toUri())
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .setAllowFlipping(false)
-                .start(context!!, this)
+        if (_cropEnabled) {
+            btnCropImage.visibility = View.VISIBLE
+            btnCropImage.setOnClickListener {
+                _currentPosition = _vpImage.currentItem
+                CropImage.activity(("file://" + _imageList[_currentPosition]).toUri())
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setAllowFlipping(false)
+                    .start(context!!, this)
+            }
+        } else {
+            btnCropImage.visibility = View.GONE
         }
 
         btnBack.setOnClickListener {
             dismiss()
         }
 
-        ibAddMore.setOnClickListener {
-            val options = Options.init()
-                .setPreSelectedUrls(_imageList)
-                .setRequestCode(100)
-                .setCount(15)
-                .setSpanCount(4)
-                .setExcludeVideos(true)
-                .setScreenOrientation(Options.SCREEN_ORIENTATION_PORTRAIT)
-                .setPath("/pix/images")
+        btnDelete.setOnClickListener {
+            deleteImage()
+        }
 
-            Pix.start(this, options)
+    }
+
+    fun deleteImage() {
+        _imageList.removeAt(_currentPosition)
+        _imageViewerThumbnailAdapter.notifyItemRemoved(_currentPosition)
+        _viewPagerAdapterAdapter.notifyDataSetChanged()
+        _imageViewerThumbnailAdapter.changeSelectedItem(_vpImage.currentItem)
+        updateCount()
+        updateThumbnailListVisibility()
+    }
+
+    fun updateThumbnailListVisibility() {
+        if (_imageList.size <= 1) {
+            _vBottom.visibility = View.GONE
+            _rvThumbNail.visibility = View.GONE
+        } else {
+            _vBottom.visibility = View.VISIBLE
+            _rvThumbNail.visibility = View.VISIBLE
+        }
+
+        if (_imageList.size == 0) {
+            dismiss()
         }
     }
 
-    fun setCroppedImage(url: Uri) {
+    @SuppressLint("SetTextI18n")
+    fun updateCount() {
+        _itemCount.text = "${_vpImage.currentItem + 1}/${_imageList.size}"
+    }
+
+    private fun setCroppedImage(url: Uri) {
         _imageList[_currentPosition] = url.toString()
-        _viewPagerAdapter.notifyDataSetChanged()
-        _vpImages.currentItem = _currentPosition
+        _viewPagerAdapterAdapter.notifyDataSetChanged()
+        _vpImage.currentItem = _currentPosition
         _imageViewerThumbnailAdapter.notifyItemChanged(_currentPosition)
 
     }
@@ -141,7 +172,6 @@ class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFrag
                 setCroppedImage(result.uri)
 
             } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-
             }
         }
     }
@@ -153,6 +183,6 @@ class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFrag
 
     override fun onItemSelected(position: Int) {
         _currentPosition = position
-        _vpImages.currentItem = position
+        _vpImage.currentItem = position
     }
 }

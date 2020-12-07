@@ -31,7 +31,7 @@
         app:layout_constraintTop_toBottomOf="@id/btnLaunchCropper" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvImages"
+        android:id="@+id/rvThumbNail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -4,16 +4,14 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.net.toUri
 import androidx.viewpager.widget.PagerAdapter
 import java.util.*
 
 
-class ImagePager(private val _views: MutableList<String>, val _context: Context) : PagerAdapter() {
+class ImagePagerAdapter(private val _views: MutableList<String>, private val _context: Context) :
+    PagerAdapter() {
 
     override fun getCount(): Int {
         return _views.size
@@ -36,7 +34,7 @@ class ImagePager(private val _views: MutableList<String>, val _context: Context)
         )
 
         val tvTest: TextView = view.findViewById(R.id.tvTest)
-        val ivImage: ImageView = view.findViewById(R.id.ivImage)
+        val ivImage: PinchToZoomImageView = view.findViewById(R.id.ivImage)
 
         tvTest.text = _views[position]
 
@@ -50,6 +48,5 @@ class ImagePager(private val _views: MutableList<String>, val _context: Context)
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
         container.removeView(`object` as ConstraintLayout)
     }
-
 
 }

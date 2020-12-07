@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnLaunchPageViewer.setOnClickListener {
-            DisplayImageDialog(returnValue).show(supportFragmentManager, "Submit")
+            DisplayImageDialog(returnValue, true).show(supportFragmentManager, "Submit")
         }
 
 //        val imageListAdapter = ImageViewerThumbnailAdapter()
@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
             returnValue = data?.getStringArrayListExtra(Pix.IMAGE_RESULTS)!!
 
             Log.i("WILLS", "onActivityResult: $returnValue")
-            DisplayImageDialog(returnValue).show(supportFragmentManager, "Submit")
+            DisplayImageDialog(returnValue, true).show(supportFragmentManager, "Submit")
 
         }
         if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
