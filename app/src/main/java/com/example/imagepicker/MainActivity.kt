@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
@@ -61,20 +60,20 @@ class MainActivity : AppCompatActivity() {
             DisplayImageDialog(returnValue).show(supportFragmentManager, "Submit")
         }
 
-        val imageListAdapter = ImageListAdapter()
+//        val imageListAdapter = ImageViewerThumbnailAdapter()
+//
+//        val rvImages: RecyclerView = findViewById(R.id.rvImages)
 
-        val rvImages: RecyclerView = findViewById(R.id.rvImages)
-
-        rvImages.apply {
-            adapter = imageListAdapter
-        }
+//        rvImages.apply {
+//            adapter = imageListAdapter
+//        }
 
         val _imageList : MutableList<String> = mutableListOf()
         for(i in 0 until 10){
             _imageList.add("dfafdsad")
         }
 
-        imageListAdapter.addList(_imageList)
+//        imageListAdapter.addList(_imageList)
 
     }
 

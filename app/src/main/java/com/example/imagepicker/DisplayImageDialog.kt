@@ -6,7 +6,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,17 +16,21 @@ import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
+import com.fxn.pix.Options
+import com.fxn.pix.Pix
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import java.util.*
 
-class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFragment() {
+class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFragment(),
+    ImageViewerThumbnailAdapter.ImageThumbnailListener {
 
     private val TAG = "WILLS"
     private var _currentPosition: Int = 0
 
     private lateinit var _viewPagerAdapter: ImagePager
     private lateinit var _vpImages: ViewPager
+    private lateinit var _imageViewerThumbnailAdapter: ImageViewerThumbnailAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,12 +62,13 @@ class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFrag
         _vpImages = view.findViewById<View>(R.id.pager) as ViewPager
 
         _viewPagerAdapter = ImagePager(_imageList, view.context)
-        val imageListAdapter = ImageListAdapter()
+        _imageViewerThumbnailAdapter = ImageViewerThumbnailAdapter(this)
 
         val btnCropImage: ImageButton = view.findViewById(R.id.btnCropImage)
         val btnBack: ImageButton = view.findViewById(R.id.btnBack)
         val itemCount: TextView = view.findViewById(R.id.itemCount)
         val rvImages: RecyclerView = view.findViewById(R.id.rvImages)
+        val ibAddMore: ImageButton = view.findViewById(R.id.ibAddMore)
 
         _vpImages.adapter = _viewPagerAdapter
 
@@ -81,7 +85,8 @@ class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFrag
             override fun onPageSelected(position: Int) {
                 _currentPosition = position
                 itemCount.text = "${_vpImages.currentItem + 1}/${_imageList.size}"
-                imageListAdapter.changeSelectedItem(position)
+                _imageViewerThumbnailAdapter.changeSelectedItem(position)
+                rvImages.scrollToPosition(_currentPosition)
             }
 
             override fun onPageScrollStateChanged(state: Int) {
@@ -89,10 +94,10 @@ class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFrag
         })
 
         rvImages.apply {
-            adapter = imageListAdapter
+            adapter = _imageViewerThumbnailAdapter
         }
 
-        imageListAdapter.addList(_imageList)
+        _imageViewerThumbnailAdapter.addList(_imageList)
 
         btnCropImage.setOnClickListener {
             _currentPosition = _vpImages.currentItem
@@ -105,12 +110,26 @@ class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFrag
         btnBack.setOnClickListener {
             dismiss()
         }
+
+        ibAddMore.setOnClickListener {
+            val options = Options.init()
+                .setPreSelectedUrls(_imageList)
+                .setRequestCode(100)
+                .setCount(15)
+                .setSpanCount(4)
+                .setExcludeVideos(true)
+                .setScreenOrientation(Options.SCREEN_ORIENTATION_PORTRAIT)
+                .setPath("/pix/images")
+
+            Pix.start(this, options)
+        }
     }
 
     fun setCroppedImage(url: Uri) {
         _imageList[_currentPosition] = url.toString()
         _viewPagerAdapter.notifyDataSetChanged()
         _vpImages.currentItem = _currentPosition
+        _imageViewerThumbnailAdapter.notifyItemChanged(_currentPosition)
 
     }
 
@@ -130,5 +149,10 @@ class DisplayImageDialog(private val _imageList: ArrayList<String>) : DialogFrag
     override fun onDismiss(dialog: DialogInterface) {
         _imageList.clear()
         super.onDismiss(dialog)
+    }
+
+    override fun onItemSelected(position: Int) {
+        _currentPosition = position
+        _vpImages.currentItem = position
     }
 }

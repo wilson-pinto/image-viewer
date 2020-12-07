@@ -9,7 +9,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 
-class ImageListAdapter : RecyclerView.Adapter<ImageListAdapter.ImageListHolder>() {
+class ImageViewerThumbnailAdapter(val _callback: DisplayImageDialog) :
+    RecyclerView.Adapter<ImageViewerThumbnailAdapter.ImageListHolder>() {
 
     private var _imageList: MutableList<String> = mutableListOf()
     private var _selectedPosition: Int = 0
@@ -35,14 +36,22 @@ class ImageListAdapter : RecyclerView.Adapter<ImageListAdapter.ImageListHolder>(
     }
 
     override fun onBindViewHolder(holder: ImageListHolder, position: Int) {
-        holder.ivImage.setImageURI(_imageList[holder.adapterPosition].toUri())
+
+        GlideUtil.loadImage(_imageList[holder.adapterPosition],holder.ivImage, holder.itemView.context )
 
         if (holder.adapterPosition == _selectedPosition) {
             holder.flWrapper.background =
                 ContextCompat.getDrawable(holder.itemView.context, R.drawable.image_border)
-        }else{
+        } else {
             holder.flWrapper.background =
                 ContextCompat.getDrawable(holder.itemView.context, R.drawable.image_no_border)
+        }
+
+        holder.ivImage.setOnClickListener {
+            if (_selectedPosition == holder.adapterPosition)
+                return@setOnClickListener
+            _callback.onItemSelected(holder.adapterPosition)
+            changeSelectedItem(holder.adapterPosition)
         }
     }
 
@@ -53,5 +62,9 @@ class ImageListAdapter : RecyclerView.Adapter<ImageListAdapter.ImageListHolder>(
     inner class ImageListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ivImage: ImageView = itemView.findViewById(R.id.ivImage)
         val flWrapper: FrameLayout = itemView.findViewById(R.id.flWrapper)
+    }
+
+    interface ImageThumbnailListener {
+        fun onItemSelected(position: Int)
     }
 }

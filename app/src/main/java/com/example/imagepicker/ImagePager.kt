@@ -39,7 +39,8 @@ class ImagePager(private val _views: MutableList<String>, val _context: Context)
         val ivImage: ImageView = view.findViewById(R.id.ivImage)
 
         tvTest.text = _views[position]
-        ivImage.setImageURI(_views[position].toUri())
+
+        GlideUtil.loadImage(_views[position], ivImage, _context)
 
         Objects.requireNonNull(container).addView(view)
 
