@@ -4,17 +4,19 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.viewpager.widget.PagerAdapter
 import java.util.*
 
 
-class ImagePagerAdapter(private val _views: MutableList<String>, private val _context: Context) :
+class ImagePagerAdapter(
+    private val _imageList: MutableList<ImageViewer>,
+    private val _context: Context
+) :
     PagerAdapter() {
 
     override fun getCount(): Int {
-        return _views.size
+        return _imageList.size
     }
 
     override fun getItemPosition(`object`: Any): Int {
@@ -33,12 +35,15 @@ class ImagePagerAdapter(private val _views: MutableList<String>, private val _co
             false
         )
 
-        val tvTest: TextView = view.findViewById(R.id.tvTest)
         val ivImage: PinchToZoomImageView = view.findViewById(R.id.ivImage)
 
-        tvTest.text = _views[position]
-
-        GlideUtil.loadImage(_views[position], ivImage, _context)
+        with( _imageList[position]) {
+            GlideUtil.loadImage(
+                if (croppedFilePath.isEmpty()) filePath else croppedFilePath,
+                ivImage,
+                _context
+            )
+        }
 
         Objects.requireNonNull(container).addView(view)
 

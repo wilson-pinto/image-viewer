@@ -9,14 +9,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 
-class ImageViewerThumbnailAdapter(val _callback: DisplayImageDialog) :
+class ImageViewerThumbnailAdapter(private val _callback: ImageThumbnailListener) :
     RecyclerView.Adapter<ImageViewerThumbnailAdapter.ImageListHolder>() {
 
-    private var _imageList: MutableList<String> = mutableListOf()
+    private var _thumbnailList: MutableList<ImageViewer> = mutableListOf()
     private var _selectedPosition: Int = 0
 
-    fun addList(imageList: MutableList<String>) {
-        _imageList = imageList
+    fun addList(imageList: MutableList<ImageViewer>) {
+        _thumbnailList = imageList
         notifyDataSetChanged()
     }
 
@@ -37,7 +37,13 @@ class ImageViewerThumbnailAdapter(val _callback: DisplayImageDialog) :
 
     override fun onBindViewHolder(holder: ImageListHolder, position: Int) {
 
-        GlideUtil.loadImage(_imageList[holder.adapterPosition],holder.ivImage, holder.itemView.context )
+        with(_thumbnailList[holder.adapterPosition]) {
+            GlideUtil.loadImage(
+                if (croppedFilePath.isEmpty()) filePath else croppedFilePath,
+                holder.ivImage,
+                holder.itemView.context
+            )
+        }
 
         if (holder.adapterPosition == _selectedPosition) {
             holder.flWrapper.background =
@@ -56,7 +62,7 @@ class ImageViewerThumbnailAdapter(val _callback: DisplayImageDialog) :
     }
 
     override fun getItemCount(): Int {
-        return _imageList.size
+        return _thumbnailList.size
     }
 
     inner class ImageListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

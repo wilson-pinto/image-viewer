@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,13 +21,14 @@ import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import java.util.*
 
-class DisplayImageDialog(
-    private val _imageList: ArrayList<String>,
+class DisplayImageDialog<T>(
+    private val _imageList: MutableList<T> = mutableListOf(),
     private val _cropEnabled: Boolean = false,
-) : DialogFragment(),
-    ImageViewerThumbnailAdapter.ImageThumbnailListener {
+    private val _onSubmit: OnSubmit? = null,
+    private val _onDelete: OnDelete? = null
+) : DialogFragment() {
 
-    private val TAG = "WILLS"
+    private val TAG = "IMG_VIEWER"
     private var _currentPosition: Int = 0
 
     private lateinit var _viewPagerAdapterAdapter: ImagePagerAdapter
@@ -65,12 +67,21 @@ class DisplayImageDialog(
 
         _vpImage = view.findViewById<View>(R.id.vpImage) as ViewPager
 
-        _viewPagerAdapterAdapter = ImagePagerAdapter(_imageList, view.context)
-        _imageViewerThumbnailAdapter = ImageViewerThumbnailAdapter(this)
+        _viewPagerAdapterAdapter =
+            ImagePagerAdapter(_imageList as MutableList<ImageViewer>, view.context)
+        _imageViewerThumbnailAdapter = ImageViewerThumbnailAdapter(object :
+            ImageViewerThumbnailAdapter.ImageThumbnailListener {
+            override fun onItemSelected(position: Int) {
+                _currentPosition = position
+                _vpImage.currentItem = position
+            }
+        })
 
         val btnCropImage: ImageButton = view.findViewById(R.id.btnCropImage)
         val btnDelete: ImageButton = view.findViewById(R.id.btnDelete)
         val btnBack: ImageButton = view.findViewById(R.id.btnBack)
+        val tvNext: TextView = view.findViewById(R.id.tvNext)
+
         _itemCount = view.findViewById(R.id.itemCount)
         _rvThumbNail = view.findViewById(R.id.rvThumbNail)
         _vBottom = view.findViewById(R.id.vBottom)
@@ -109,7 +120,7 @@ class DisplayImageDialog(
             btnCropImage.visibility = View.VISIBLE
             btnCropImage.setOnClickListener {
                 _currentPosition = _vpImage.currentItem
-                CropImage.activity(("file://" + _imageList[_currentPosition]).toUri())
+                CropImage.activity(("file://" + _imageList[_currentPosition].filePath).toUri())
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .setAllowFlipping(false)
                     .start(context!!, this)
@@ -123,21 +134,35 @@ class DisplayImageDialog(
         }
 
         btnDelete.setOnClickListener {
-            deleteImage()
+            if (_onDelete == null) {
+                deleteImage(_currentPosition)
+            } else {
+                _onDelete.onDelete(_currentPosition)
+            }
+        }
+
+        tvNext.text = if (_onSubmit == null) "Done" else "Upload"
+
+        tvNext.setOnClickListener {
+            if (_onSubmit != null) {
+                _imageList.forEach { it.resetFilePath() }
+                _onSubmit.onSubmit()
+            }
+            dismiss()
         }
 
     }
 
-    fun deleteImage() {
-        _imageList.removeAt(_currentPosition)
-        _imageViewerThumbnailAdapter.notifyItemRemoved(_currentPosition)
+    fun deleteImage(position: Int) {
+        _imageList.removeAt(position)
+        _imageViewerThumbnailAdapter.notifyItemRemoved(position)
         _viewPagerAdapterAdapter.notifyDataSetChanged()
         _imageViewerThumbnailAdapter.changeSelectedItem(_vpImage.currentItem)
         updateCount()
         updateThumbnailListVisibility()
     }
 
-    fun updateThumbnailListVisibility() {
+    private fun updateThumbnailListVisibility() {
         if (_imageList.size <= 1) {
             _vBottom.visibility = View.GONE
             _rvThumbNail.visibility = View.GONE
@@ -157,7 +182,12 @@ class DisplayImageDialog(
     }
 
     private fun setCroppedImage(url: Uri) {
-        _imageList[_currentPosition] = url.toString()
+        with(_imageList[_currentPosition] as ImageViewer) {
+            if (!isCropped) {
+                isCropped = true
+            }
+            croppedFilePath = url.toString()
+        }
         _viewPagerAdapterAdapter.notifyDataSetChanged()
         _vpImage.currentItem = _currentPosition
         _imageViewerThumbnailAdapter.notifyItemChanged(_currentPosition)
@@ -170,7 +200,6 @@ class DisplayImageDialog(
             val result = CropImage.getActivityResult(data)
             if (resultCode === AppCompatActivity.RESULT_OK) {
                 setCroppedImage(result.uri)
-
             } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
             }
         }
@@ -181,8 +210,11 @@ class DisplayImageDialog(
         super.onDismiss(dialog)
     }
 
-    override fun onItemSelected(position: Int) {
-        _currentPosition = position
-        _vpImage.currentItem = position
+    interface OnSubmit {
+        fun onSubmit()
+    }
+
+    interface OnDelete {
+        fun onDelete(position: Int)
     }
 }

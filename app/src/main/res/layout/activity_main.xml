@@ -10,34 +10,23 @@
         android:id="@+id/btnLaunchPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="launch picker"
+        android:text="Launch Picker"
+        android:paddingHorizontal="20dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <Button
-        android:id="@+id/btnLaunchCropper"
+    <TextView
+        android:id="@+id/tvSelectedItems"
         android:layout_width="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="0 items selected"
         android:layout_height="wrap_content"
-        android:text="launch Cropper"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLaunchPicker" />
-
-    <Button
-        android:id="@+id/btnLaunchPageViewer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="launch Viewer"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnLaunchCropper" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvThumbNail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:orientation="horizontal"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnLaunchPicker"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
