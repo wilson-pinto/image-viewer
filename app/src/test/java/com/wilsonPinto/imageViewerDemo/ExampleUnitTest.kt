@@ -1,4 +1,4 @@
-package com.example.imagepicker
+package com.wilsonPinto.imageViewerDemo
 
 import org.junit.Test
 

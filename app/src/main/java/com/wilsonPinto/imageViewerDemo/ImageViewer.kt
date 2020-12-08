@@ -1,4 +1,4 @@
-package com.example.imagepicker
+package com.wilsonPinto.imageViewerDemo
 
 abstract class ImageViewer {
     abstract var filePath: String

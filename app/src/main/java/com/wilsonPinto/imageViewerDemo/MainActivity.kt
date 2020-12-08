@@ -1,4 +1,4 @@
-package com.example.imagepicker
+package com.wilsonPinto.imageViewerDemo
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -15,7 +15,6 @@ import com.fxn.pix.Pix
 import com.fxn.utility.PermUtil
 import com.google.android.material.snackbar.Snackbar
 import com.theartofdev.edmodo.cropper.CropImage
-import java.util.*
 
 
 //source : https://github.com/ArthurHub/Android-Image-Cropper

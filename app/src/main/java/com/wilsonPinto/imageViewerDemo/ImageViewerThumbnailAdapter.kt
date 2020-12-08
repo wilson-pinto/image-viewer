@@ -1,4 +1,4 @@
-package com.example.imagepicker
+package com.wilsonPinto.imageViewerDemo
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 
 class ImageViewerThumbnailAdapter(private val _callback: ImageThumbnailListener) :
