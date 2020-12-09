@@ -1,4 +1,4 @@
-package com.wilsonPinto.imageViewerDemo
+package com.wilsonpinto.imageviewerdemo
 
 abstract class ImageViewer {
     abstract var filePath: String

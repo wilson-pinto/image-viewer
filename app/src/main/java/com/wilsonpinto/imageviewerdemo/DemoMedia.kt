@@ -1,4 +1,4 @@
-package com.wilsonPinto.imageViewerDemo
+package com.wilsonpinto.imageviewerdemo
 
 data class DemoMedia(
     var testField: String,

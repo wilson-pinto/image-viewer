@@ -1,4 +1,4 @@
-package com.wilsonPinto.imageViewerDemo
+package com.wilsonpinto.imageviewerdemo
 
 import android.view.LayoutInflater
 import android.view.View
