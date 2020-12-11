@@ -8,11 +8,11 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
-class ImageViewerThumbnailAdapter(private val _callback: ImageThumbnailListener) :
+
+class ImageViewerThumbnailAdapter(private val _callback: ImageThumbnailListener, private var _selectedPosition: Int = 0) :
     RecyclerView.Adapter<ImageViewerThumbnailAdapter.ImageListHolder>() {
 
     private var _thumbnailList: MutableList<ImageViewer> = mutableListOf()
-    private var _selectedPosition: Int = 0
 
     fun addList(imageList: MutableList<ImageViewer>) {
         _thumbnailList = imageList
@@ -38,18 +38,18 @@ class ImageViewerThumbnailAdapter(private val _callback: ImageThumbnailListener)
 
         with(_thumbnailList[holder.adapterPosition]) {
             GlideUtil.loadImage(
-                if (croppedFilePath.isEmpty()) filePath else croppedFilePath,
+                getFileUrl(),
+                true,
                 holder.ivImage,
-                holder.itemView.context
             )
         }
 
         if (holder.adapterPosition == _selectedPosition) {
             holder.flWrapper.background =
-                ContextCompat.getDrawable(holder.itemView.context, R.drawable.image_border)
+                ContextCompat.getDrawable(holder.itemView.context, R.drawable.image_viewer_border)
         } else {
             holder.flWrapper.background =
-                ContextCompat.getDrawable(holder.itemView.context, R.drawable.image_no_border)
+                ContextCompat.getDrawable(holder.itemView.context, R.drawable.image_viewer_no_border)
         }
 
         holder.ivImage.setOnClickListener {
