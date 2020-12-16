@@ -8,7 +8,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.viewpager.widget.PagerAdapter
 import java.util.*
 
-
 class ImagePagerAdapter(
     private val _imageList: MutableList<ImageViewer>,
     private val _context: Context
@@ -30,18 +29,17 @@ class ImagePagerAdapter(
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
 
         val view: View = LayoutInflater.from(container.context).inflate(
-            R.layout.item,
+            R.layout.pager_image_viewer,
             container,
             false
         )
 
         val ivImage: PinchToZoomImageView = view.findViewById(R.id.ivImage)
 
-        with( _imageList[position]) {
+        with(_imageList[position]) {
             GlideUtil.loadImage(
-                if (croppedFilePath.isEmpty()) filePath else croppedFilePath,
+                getFileUrl(),
                 ivImage,
-                _context
             )
         }
 
