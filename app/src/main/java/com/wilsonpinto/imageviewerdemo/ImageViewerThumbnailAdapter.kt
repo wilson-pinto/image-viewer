@@ -41,6 +41,7 @@ class ImageViewerThumbnailAdapter(private val _callback: ImageThumbnailListener,
                 getFileUrl(),
                 true,
                 holder.ivImage,
+                context = holder.itemView.context
             )
         }
 

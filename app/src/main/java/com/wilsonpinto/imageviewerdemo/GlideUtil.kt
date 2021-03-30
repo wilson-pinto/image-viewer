@@ -10,9 +10,9 @@ object GlideUtil {
 
     var instance: Application? = null
 
-    private fun getContext(): Context {
-        return instance!!.applicationContext
-    }
+//    private fun getContext(): Context {
+//        return instance!!.applicationContext
+//    }
 
     fun loadImage(url: String?,  view: ImageView?, context : Context) {
         Glide.with(context)
@@ -21,21 +21,21 @@ object GlideUtil {
             .into(view!!)
     }
 
-    fun loadImage(url: String?, diskCacheRequired: Boolean, view: ImageView?) {
+    fun loadImage(url: String?, diskCacheRequired: Boolean, view: ImageView?, context : Context) {
         val diskCacheStrategy = if (diskCacheRequired) {
             DiskCacheStrategy.ALL
         } else {
             DiskCacheStrategy.NONE
         }
-        Glide.with(getContext())
+        Glide.with(context)
             .load(url)
             .diskCacheStrategy(diskCacheStrategy)
             .into(view!!)
     }
 
-    fun loadImage(url: String?, view: ImageView?) {
-        // TODO: set disk caching strategy
-        Glide.with(getContext()).load(url).into(view!!)
-    }
+//    fun loadImage(url: String?, view: ImageView?) {
+//        // TODO: set disk caching strategy
+//        Glide.with(getContext()).load(url).into(view!!)
+//    }
 
 }

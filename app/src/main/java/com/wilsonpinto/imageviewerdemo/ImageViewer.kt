@@ -1,5 +1,7 @@
 package com.wilsonpinto.imageviewerdemo
 
+import com.wilsonPinto.imageViewerDemo.AppConfig
+
 abstract class ImageViewer {
     abstract var filePath: String
     abstract var fileName: String

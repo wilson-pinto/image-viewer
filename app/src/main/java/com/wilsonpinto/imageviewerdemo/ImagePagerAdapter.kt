@@ -40,6 +40,7 @@ class ImagePagerAdapter(
             GlideUtil.loadImage(
                 getFileUrl(),
                 ivImage,
+                    _context
             )
         }
 
